@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2024-07-09'
+Transform: AWS::Serverless-2024-07-09
+Description: AWS Serverless Spring Boot 2 API - org.tiaa::aws-lambda-registration
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
+Resources:
+  AwsLambdaExampleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: org.tiaa.sma.registrationservice.StreamLambdaHandler::handleRequest
+      Runtime: java17
+      CodeUri: .
+      MemorySize: 512
+      Policies: AWSLambdaBasicExecutionRole
+      Timeout: 30
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 2  # Provisioned concurrency
+      Events:
+        ProxyResource:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+
+Outputs:
+  AwsLambdaExampleApi:
+    Description: URL for application
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ping'
+    Export:
+      Name: AwsLambdaRegistrationApi
